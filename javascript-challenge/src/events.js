@@ -30,7 +30,7 @@
 
  Your solution should not modify any of the function arguments
 */
-const { parseISO, differenceInDays } = require('date-fns');
+const { parseISO, differenceInDays, add } = require('date-fns');
 
 const eventsArray = [
   {
@@ -84,6 +84,7 @@ const groupEventsByDay = (events) => {
 };
 
 groupEventsByDay(eventsArray);
+
 /** 
   Adjust the start and end date of an event so it maintains its total duration, but is moved `toDay`.
   `eventsByDay` should be the same as the return value of `groupEventsByDay`
@@ -119,11 +120,34 @@ groupEventsByDay(eventsArray);
 
   Your solution should not modify any of the function arguments
 */
+
+const getObjectById = (events, id) => {
+  for (let i in events) {
+    for (let j = 0; j < events[i].length; j++) {
+      if (events[i][j].id == id) {
+        return { eventToMod: events[i][j], currentDay: Number(i) };
+      }
+    }
+  }
+};
+
 const moveEventToDay = (eventsByDay, id, toDay) => {
-  return eventsByDay;
+  if (typeof id !== 'number' || typeof toDay !== 'number')
+    throw new Error('id and toDay must be numbers');
+
+  const { eventToMod, currentDay } = getObjectById(eventsByDay, id);
+  let dayDiff = toDay - currentDay;
+  if (dayDiff > 0) {
+    eventToMod.startsAt = add(parseISO(eventToMod.startsAt), { days: dayDiff });
+    eventToMod.endsAt = add(parseISO(eventToMod.endsAt), { days: dayDiff });
+  }
+  console.log(eventToMod);
+
+  // return eventsByDay;
 };
 
 module.exports = {
+  getObjectById,
   moveEventToDay,
   groupEventsByDay,
 };

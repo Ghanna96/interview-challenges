@@ -1,4 +1,4 @@
-const { moveEventToDay, groupEventsByDay } = require('./events');
+const { getObjectById, moveEventToDay, groupEventsByDay } = require('./events');
 
 const eventsArray = [
   {
@@ -21,7 +21,7 @@ const eventsArray = [
   },
 ];
 
-const mockResult = {
+const groupedEvents = {
   0: [
     {
       id: 107,
@@ -59,12 +59,6 @@ const invalidArray = [
     endsAt: '2021-01-27T22:01:11Z',
     title: 'Dinner',
   },
-  {
-    id: 5676,
-    startsAt: '2021-01-29T13:01:11Z',
-    endsAt: '2021-01-27T15:01:11Z',
-    title: 'Daily walk',
-  },
   'hello',
 ];
 describe('groupEventsByDay', () => {
@@ -77,8 +71,56 @@ describe('groupEventsByDay', () => {
   });
   it('group by days', () => {
     expect(() => groupEventsByDay(eventsArray)).toBeDefined();
-    expect(groupEventsByDay(eventsArray)).toStrictEqual(mockResult);
+    expect(groupEventsByDay(eventsArray)).toEqual(groupedEvents);
   });
 });
 
-test('moveEvent', () => {});
+const returnedObj = {
+  eventToMod: {
+    id: 156,
+    startsAt: '2021-01-27T17:01:11Z',
+    endsAt: '2021-01-27T22:01:11Z',
+    title: 'Dinner',
+  },
+  currentDay: 0,
+};
+
+const movedEvent = {
+  0: [
+    {
+      id: 107,
+      startsAt: '2021-01-27T13:01:11Z',
+      endsAt: '2021-01-27T15:01:11Z',
+      title: 'Daily walk',
+    },
+    {
+      id: 156,
+      startsAt: '2021-01-27T17:01:11Z',
+      endsAt: '2021-01-27T22:01:11Z',
+      title: 'Dinner',
+    },
+  ],
+  4: [
+    {
+      id: 5676,
+      startsAt: '2021-01-31T13:01:11Z',
+      endsAt: '2021-01-31T15:01:11Z',
+      title: 'Daily walk',
+    },
+  ],
+};
+describe('moveEventToDay', () => {
+  it('getObjectById', () => {
+    expect(getObjectById(groupedEvents, 156)).toStrictEqual(returnedObj);
+  });
+  it('throw error', () => {
+    expect(() => {
+      moveEventToDay(groupedEvents, 156, '4');
+    }).toThrow('id and toDay must be numbers');
+  });
+  it('moveEvent', () => {
+    expect(moveEventToDay(groupedEvents, 156, 4)).toStrictEqual(movedEvent);
+  });
+
+  // it('moveEvent', () => {});
+});
