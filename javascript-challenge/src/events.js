@@ -30,7 +30,13 @@
 
  Your solution should not modify any of the function arguments
 */
-const { parseISO, differenceInDays, add } = require('date-fns');
+const {
+  parseISO,
+  differenceInDays,
+  addDays,
+  subDays,
+  formatISO,
+} = require('date-fns');
 
 const eventsArray = [
   {
@@ -87,13 +93,13 @@ groupEventsByDay(eventsArray);
 
 /** 
   Adjust the start and end date of an event so it maintains its total duration, but is moved `toDay`.
-  `eventsByDay` should be the same as the return value of `groupEventsByDay`
+  `updatedEvents` should be the same as the return value of `groupEventsByDay`
   `id` will be the event that should be moved
-  `toDay` will be a number that indicates the key of `eventsByDay` that the target event should be moved to
+  `toDay` will be a number that indicates the key of `updatedEvents` that the target event should be moved to
 
   Example:
   ```
-  eventsByDay(
+  updatedEvents(
     {
       0: [
         { id: 106, startsAt: '2021-01-27T13:01:11Z',  endsAt: '2021-01-27T15:01:11Z',  title: 'Daily walk' },      
@@ -125,7 +131,7 @@ const getObjectById = (events, id) => {
   for (let i in events) {
     for (let j = 0; j < events[i].length; j++) {
       if (events[i][j].id == id) {
-        return { eventToMod: events[i][j], currentDay: Number(i) };
+        return { eventToMod: events[i][j], currentDay: Number(i), index: j };
       }
     }
   }
@@ -135,15 +141,42 @@ const moveEventToDay = (eventsByDay, id, toDay) => {
   if (typeof id !== 'number' || typeof toDay !== 'number')
     throw new Error('id and toDay must be numbers');
 
-  const { eventToMod, currentDay } = getObjectById(eventsByDay, id);
+  const { eventToMod, currentDay, index } = getObjectById(eventsByDay, id);
+  const updatedEvents = Object.assign(eventsByDay);
+
+  //adding/subtracting days
   let dayDiff = toDay - currentDay;
   if (dayDiff > 0) {
-    eventToMod.startsAt = add(parseISO(eventToMod.startsAt), { days: dayDiff });
-    eventToMod.endsAt = add(parseISO(eventToMod.endsAt), { days: dayDiff });
-  }
-  console.log(eventToMod);
+    eventToMod.startsAt = formatISO(
+      addDays(parseISO(eventToMod.startsAt), dayDiff),
+    );
+    eventToMod.endsAt = formatISO(
+      addDays(parseISO(eventToMod.endsAt), dayDiff),
+    );
+  } else if (dayDiff < 0) {
+    dayDiff *= -1;
+    eventToMod.startsAt = formatISO(
+      subDays(parseISO(eventToMod.startsAt), dayDiff),
+    );
+    eventToMod.endsAt = formatISO(
+      subDays(parseISO(eventToMod.endsAt), dayDiff),
+    );
+  } else return updatedEvents;
 
-  // return eventsByDay;
+  //updating object
+  if (updatedEvents.hasOwnProperty(toDay)) {
+    updatedEvents[toDay].push(eventToMod);
+  } else {
+    updatedEvents[toDay] = [];
+    updatedEvents[toDay].push(eventToMod);
+  }
+  updatedEvents[currentDay].splice(index, 1);
+
+  if (updatedEvents[currentDay].length === 0) {
+    delete updatedEvents[currentDay];
+  }
+
+  return updatedEvents;
 };
 
 module.exports = {

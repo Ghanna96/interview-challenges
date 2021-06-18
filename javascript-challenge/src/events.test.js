@@ -83,6 +83,7 @@ const returnedObj = {
     title: 'Dinner',
   },
   currentDay: 0,
+  index: 1,
 };
 
 const movedEvent = {
@@ -109,6 +110,30 @@ const movedEvent = {
     },
   ],
 };
+const movedEvent2 = {
+  0: [
+    {
+      id: 107,
+      startsAt: '2021-01-27T13:01:11Z',
+      endsAt: '2021-01-27T15:01:11Z',
+      title: 'Daily walk',
+    },
+    {
+      id: 156,
+      startsAt: '2021-01-27T17:01:11Z',
+      endsAt: '2021-01-27T22:01:11Z',
+      title: 'Dinner',
+    },
+  ],
+  2: [
+    {
+      id: 5676,
+      startsAt: '2021-01-29T13:01:11Z',
+      endsAt: '2021-01-29T15:01:11Z',
+      title: 'Daily walk',
+    },
+  ],
+};
 describe('moveEventToDay', () => {
   it('getObjectById', () => {
     expect(getObjectById(groupedEvents, 156)).toStrictEqual(returnedObj);
@@ -118,9 +143,11 @@ describe('moveEventToDay', () => {
       moveEventToDay(groupedEvents, 156, '4');
     }).toThrow('id and toDay must be numbers');
   });
-  it('moveEvent', () => {
-    expect(moveEventToDay(groupedEvents, 156, 4)).toStrictEqual(movedEvent);
+  it('moveEvent and add days', () => {
+    expect(moveEventToDay(groupedEvents, 5676, 4)).toStrictEqual(movedEvent);
   });
-
+  it('moveEvent and subtract days', () => {
+    expect(moveEventToDay(groupedEvents, 5676, 2)).toStrictEqual(movedEvent2);
+  });
   // it('moveEvent', () => {});
 });
