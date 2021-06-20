@@ -134,6 +134,7 @@ const movedEvent2 = {
     },
   ],
 };
+
 describe('moveEventToDay', () => {
   it('getObjectById', () => {
     expect(getObjectById(groupedEvents, 156)).toStrictEqual(returnedObj);
@@ -143,11 +144,16 @@ describe('moveEventToDay', () => {
       moveEventToDay(groupedEvents, 156, '4');
     }).toThrow('id and toDay must be numbers');
   });
+  it('cannot find id', () => {
+    expect(() => {
+      moveEventToDay(groupedEvents, 157, 4);
+    }).toThrow('cannot find id');
+  });
   it('moveEvent and add days', () => {
     expect(moveEventToDay(groupedEvents, 5676, 4)).toStrictEqual(movedEvent);
   });
+
   it('moveEvent and subtract days', () => {
     expect(moveEventToDay(groupedEvents, 5676, 2)).toStrictEqual(movedEvent2);
   });
-  // it('moveEvent', () => {});
 });

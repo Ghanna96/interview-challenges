@@ -131,7 +131,11 @@ const getObjectById = (events, id) => {
   for (let i in events) {
     for (let j = 0; j < events[i].length; j++) {
       if (events[i][j].id == id) {
-        return { eventToMod: events[i][j], currentDay: Number(i), index: j };
+        return {
+          eventToMod: { ...events[i][j] },
+          currentDay: Number(i),
+          index: j,
+        };
       }
     }
   }
@@ -141,7 +145,11 @@ const moveEventToDay = (eventsByDay, id, toDay) => {
   if (typeof id !== 'number' || typeof toDay !== 'number')
     throw new Error('id and toDay must be numbers');
 
+  if (!getObjectById(eventsByDay, id)) {
+    throw new Error('cannot find id');
+  }
   const { eventToMod, currentDay, index } = getObjectById(eventsByDay, id);
+
   const updatedEvents = Object.assign(eventsByDay);
 
   //adding/subtracting days
